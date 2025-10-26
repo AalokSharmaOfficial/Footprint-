@@ -334,3 +334,4 @@ body {
 .border-fonts { border-color: var(--color-rose); }
 .border-clipboard { border-color: var(--color-fuchsia); }
 .border-media { border-color: var(--color-violet); }
+.border-credentials { border-color: var(--color-violet); }

@@ -14,6 +14,7 @@ const icons = {
   FontIcon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v12M11 5h10M17 3v12M5 21h14a2 2 0 002-2v-2" /></svg>`,
   ClipboardIcon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>`,
   CameraIcon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>`,
+  KeyIcon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" /></svg>`,
 };
 
 function createDataRow(label, value) {
@@ -134,6 +135,84 @@ function createPermissionCard({ title, icon, category, description, buttonText, 
     return card;
 }
 
+function createCredentialManagerCard({ onSave, onRetrieve }) {
+    const container = document.createElement('div');
+
+    const description = document.createElement('p');
+    description.style.marginBottom = '1rem';
+    description.innerHTML = 'This is a <strong>live demonstration</strong> of the Credential Management API. Websites use this to interact with your browser\'s built-in password manager. Click to save a sample credential, then try to retrieve it. Notice how the browser always asks for your permission before filling in login info.';
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.gap = '0.5rem';
+    buttonContainer.style.flexWrap = 'wrap';
+
+    const saveButton = document.createElement('button');
+    saveButton.className = 'btn btn-card';
+    saveButton.textContent = 'Save Demo Credentials';
+    saveButton.style.flex = '1';
+    
+    const retrieveButton = document.createElement('button');
+    retrieveButton.className = 'btn btn-card';
+    retrieveButton.textContent = 'Read Saved Login';
+    retrieveButton.style.flex = '1';
+
+    const resultContainer = document.createElement('div');
+    resultContainer.style.marginTop = '1rem';
+    
+    buttonContainer.append(saveButton, retrieveButton);
+    container.append(description, buttonContainer, resultContainer);
+
+    const card = createInfoCard({
+        title: "Browser Password Manager",
+        icon: icons.KeyIcon,
+        category: 'credentials',
+        children: container
+    });
+    
+    saveButton.addEventListener('click', async () => {
+        saveButton.disabled = true;
+        saveButton.textContent = 'Saving...';
+        const result = await onSave();
+        saveButton.textContent = 'Save Demo Credentials';
+        saveButton.disabled = false;
+        resultContainer.innerHTML = '';
+        const p = document.createElement('p');
+        p.textContent = result.message;
+        resultContainer.appendChild(p);
+    });
+    
+    retrieveButton.addEventListener('click', async () => {
+        retrieveButton.disabled = true;
+        retrieveButton.textContent = 'Waiting for you...';
+        const result = await onRetrieve();
+        retrieveButton.textContent = 'Read Saved Login';
+        retrieveButton.disabled = false;
+        resultContainer.innerHTML = '';
+        
+        if (result.username) {
+            const dl = document.createElement('dl');
+            dl.appendChild(createDataRow('Username Found', result.username));
+            resultContainer.appendChild(dl);
+
+            const note = document.createElement('p');
+            note.className = 'info-card-note';
+            note.style.borderTop = 'none';
+            note.style.paddingTop = '0.5rem';
+            note.style.marginTop = '0';
+            note.innerHTML = '<strong>Note:</strong> The password itself is <strong>never</strong> exposed to the website. The browser handles it securely.';
+            resultContainer.appendChild(note);
+        } else {
+            const p = document.createElement('p');
+            p.textContent = result.message;
+            resultContainer.appendChild(p);
+        }
+    });
+    
+    return card;
+}
+
+
 function createSection(title, cards, containerClass = 'results-grid') {
     const fragment = document.createDocumentFragment();
     const h2 = document.createElement('h2');
@@ -189,7 +268,7 @@ export function renderInitialView() {
 }
 
 export function renderResultsView(container, userData, actionHandlers) {
-    const { getClipboardInfo, getMediaDeviceInfo } = actionHandlers;
+    const { getClipboardInfo, getMediaDeviceInfo, saveCredentials, getCredentials } = actionHandlers;
     const initialView = document.getElementById('initial-view');
     const loadingView = document.getElementById('loading-view');
     
@@ -302,7 +381,11 @@ export function renderResultsView(container, userData, actionHandlers) {
             description: "A site can ask for camera and microphone access. Even if you don't stream, this permission allows the site to list all your media devices.",
             buttonText: 'Request Media Device Access',
             onButtonClick: getMediaDeviceInfo
+        }),
+        createCredentialManagerCard({
+            onSave: saveCredentials,
+            onRetrieve: getCredentials
         })
     ];
-    container.appendChild(createSection("Deeper Data Access (With Your Permission)", permissionCards, 'results-grid two-cols'));
+    container.appendChild(createSection("Deeper Data Access (With Your Permission)", permissionCards, 'results-grid'));
 }

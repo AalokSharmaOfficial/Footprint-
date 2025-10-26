@@ -1,8 +1,8 @@
 
-import { collectAllData, getClipboardInfo, getMediaDeviceInfo } from './js/dataCollector.js';
+import { collectAllData, getClipboardInfo, getMediaDeviceInfo, saveCredentials, getCredentials } from './js/dataCollector.js';
 import { renderInitialView, renderLoadingView, renderResultsView, renderErrorView } from './js/ui.js';
 
-const APP_VERSION = '2.2.1';
+const APP_VERSION = '2.4.0';
 
 document.addEventListener('DOMContentLoaded', () => {
     const mainContent = document.getElementById('main-content');
@@ -26,6 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
             renderResultsView(resultsView, data, {
                 getClipboardInfo,
                 getMediaDeviceInfo,
+                saveCredentials,
+                getCredentials,
             });
             
             // Show "Run Again" button

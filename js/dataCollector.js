@@ -329,3 +329,41 @@ export async function getMediaDeviceInfo() {
         return { devices: [], count: 0, error: "Permission denied or no devices found." };
     }
 }
+
+export async function saveCredentials() {
+    try {
+        if (!navigator.credentials) {
+            return { message: "Credential Management API not supported." };
+        }
+        const cred = new PasswordCredential({
+            id: 'demo_user@example.com',
+            name: 'Demo User',
+            password: 'fakepassword123',
+        });
+        await navigator.credentials.store(cred);
+        return { message: 'Successfully stored demo credentials for "demo_user@example.com" in your browser\'s password manager.' };
+    } catch (error) {
+        console.error("Could not save credentials:", error);
+        return { message: "Failed to save credentials. You might have cancelled the operation." };
+    }
+}
+
+export async function getCredentials() {
+    try {
+        if (!navigator.credentials) {
+            return { message: "Credential Management API not supported." };
+        }
+        const cred = await navigator.credentials.get({
+            password: true,
+        });
+
+        if (cred) {
+            return { username: cred.id, message: 'Credential retrieved successfully.' };
+        } else {
+            return { message: 'No credential chosen or available.' };
+        }
+    } catch (error) {
+        console.error("Could not retrieve credentials:", error);
+        return { message: "Operation to retrieve credentials failed or was cancelled." };
+    }
+}
