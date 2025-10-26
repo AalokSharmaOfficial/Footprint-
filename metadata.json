@@ -1,0 +1,9 @@
+{
+  "name": "Digital Footprint Explorer",
+  "description": "An educational tool that demonstrates what kind of data a website provider can potentially access from a user's browser and device upon interaction. It visualizes public information like IP address, device specs, location, and more, while also clarifying common privacy misconceptions.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera",
+    "microphone"
+  ]
+}

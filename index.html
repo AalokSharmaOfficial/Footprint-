@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👣</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digital Footprint Explorer</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">👣 Digital Footprint Explorer</h1>
+            <span class="version-badge" id="app-version"></span>
+        </header>
+
+        <main id="main-content">
+            <div class="initial-view" id="initial-view">
+                <h2 class="intro-title">What does this website know about you?</h2>
+                <p class="intro-text">
+                    Click the button below to see what a website provider (like us) can learn about you from your browser and device. This tool demonstrates your public digital footprint by collecting and displaying information your browser makes available.
+                </p>
+            </div>
+            <div id="loading-view" class="loading-view" style="display: none;">
+                <div class="spinner"></div>
+                <p class="loading-text">Analyzing your digital footprint...</p>
+                <p class="loading-subtext">Running advanced fingerprinting and collecting device properties.</p>
+            </div>
+            <div id="results-view" class="results-view"></div>
+        </main>
+
+        <footer class="footer">
+            <button class="btn btn-secondary" id="reveal-button">
+                Reveal My Digital Footprint
+            </button>
+            <p class="copyright">&copy; 2024 Digital Footprint Explorer. An educational tool to promote privacy awareness.</p>
+        </footer>
+    </div>
+    <script type="module" src="index.js"></script>
+</body>
+</html>
